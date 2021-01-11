@@ -17,13 +17,13 @@
 
 // Pin setup
 #define RightSWBacklightPin 13
-#define LeftSWBacklightPin 20
+#define LeftSWBacklightPin A6
 
 #define RightSWPotPin 14
 #define LeftSWPotPin 23
 
-#define RightHeatPin 18
-#define LeftHeatPin 19
+#define RightHeatPin A4
+#define LeftHeatPin A5
 
 #define DC12VReadPin 21
 #define LightsReadPin 22
@@ -34,8 +34,8 @@ int DebugMode = 1;
 
 //IO variables
 
-bool RightSWBacklightOut = 0;
-bool LeftSWBacklightOut = 0;
+int RightSWBacklightOut = 0;
+int LeftSWBacklightOut = 0;
 
 int RightHeatOut = 0;
 int LeftHeatOut = 0;
@@ -127,7 +127,7 @@ void ReadAndSetBacklights (){
   }
   
 }
-  
+
 void PlotReadings () {
   if (DebugMode == 1){
   Serial.print(LeftSWReading);
