@@ -6,9 +6,9 @@
 * 14/A0 - Input - Right Switch potentiometer reading
 * 22/A8 - Output - Right heater output
 * 
-* 23/A9 - Output - Left heater output
 * 3 - Output - Left Switch Backlight illum
 * 15/A1 - Input - Left swtich potentiometer reading
+* 23/A9 - Output - Left heater output
 * 
 * 16/A2 - Input - +12 volt reading
 * 17/A3 - Input - +12v when car lights are on
@@ -22,8 +22,8 @@
 #define RightSWPotPin 14
 #define LeftSWPotPin 15
 
-#define RightHeatPin A8
-#define LeftHeatPin A9
+#define RightHeatPin 22
+#define LeftHeatPin 23
 
 #define DC12VReadPin 16
 #define LightsReadPin 17
@@ -98,13 +98,13 @@ void ReadInputs () { //function to read all the inputs to the system
   ScaledRightSWReading = (((RightSWReading*100)/DC12VReading)*10); // Scale the read pot value as a percentage of the read main voltage
     if (ScaledRightSWReading <= 100) { //if the pot is off (or as near as possible to off), set the heaters off
     RightHeatOut = HeatOutLevelArray[0];
-  }else if (585 >= ScaledRightSWReading && ScaledLeftSWReading >= 535){
+  }else if (585 >= ScaledRightSWReading && ScaledRightSWReading >= 535){
     RightHeatOut = HeatOutLevelArray[1];
-  }else if (685 >= ScaledRightSWReading && ScaledLeftSWReading >= 586){
+  }else if (685 >= ScaledRightSWReading && ScaledRightSWReading >= 586){
     RightHeatOut = HeatOutLevelArray[2];
-  }else if (820 >= ScaledRightSWReading && ScaledLeftSWReading >= 686){
+  }else if (820 >= ScaledRightSWReading && ScaledRightSWReading >= 686){
     RightHeatOut = HeatOutLevelArray[3];
-  }else if (915 >= ScaledRightSWReading && ScaledLeftSWReading >= 821){
+  }else if (915 >= ScaledRightSWReading && ScaledRightSWReading >= 821){
     RightHeatOut = HeatOutLevelArray[4];   
   }else if (ScaledRightSWReading >= 916){
     RightHeatOut = HeatOutLevelArray[5];
@@ -123,27 +123,30 @@ void ReadAndSetBacklights (){
     digitalWrite(RightSWBacklightPin, HIGH);
   } else {
     digitalWrite(LeftSWBacklightPin, LOW);
-    digitalWrite(LeftSWBacklightPin, LOW);
+    digitalWrite(RightSWBacklightPin, LOW);
   }
 }
 
 void PlotReadings () {
   if (DebugMode == 1){
-  Serial.print(LeftSWReading);
-  Serial.print(" ");
+  //Serial.print(LeftSWReading);
+  //Serial.print(" ");
   Serial.print(DC12VReading);
   Serial.print(" ");
-  Serial.print(ScaledLeftSWReading);
-  Serial.print(" ");
-  Serial.print(LeftHeatOut);
-  Serial.print(" ");
-  Serial.print(LightsReading);
+  //Serial.print(ScaledLeftSWReading);
+  //Serial.print(" ");
+  //Serial.print(LeftHeatOut);
+  //Serial.print(" ");
+  //Serial.print(RightHeatOut);
+  //Serial.print(" ");
+  //Serial.print(LightsReading);
+  //Serial.print(" ");
   Serial.print(RightSWReading);
   Serial.print(" ");
   Serial.print(ScaledRightSWReading);
   Serial.print(" ");
-  Serial.print(RightHeatOut);
-  Serial.print(" ");
-  Serial.println(LightsReading);
+  Serial.println(RightHeatOut);
+  //Serial.print(" ");
+  //Serial.println(LightsReading);
   }
   }
