@@ -15,6 +15,9 @@
 *
  */
 
+// Libraries
+#include <SlowPWM.h>
+
 // Pin setup
 #define RightSWBacklightPin 4
 #define LeftSWBacklightPin 3
@@ -31,8 +34,9 @@
 //Global Variables
 
 int DebugMode = 1;
+unsigned long previousMillis = 0;
 
-//IO variables
+//Global IO variables
 
 int RightSWBacklightOut = 0;
 int LeftSWBacklightOut = 0;
@@ -46,11 +50,17 @@ int LeftSWReading = 0;
 int DC12VReading = 0;
 int LightsReading = 0; //perhaps this should be a boolean?
 
-int HeatOutLevelArray[] = {0,50,100,150,200,256}; // the variable to make setting non-linear heating settings easy (0-256)
+int GlobalPWMFreq = 1000; //global PWM frequency for both seats in ms
+
+int HeatOutLevelArray[] = {0,50,100,150,200,255}; // the variable to make setting non-linear heating settings easy (0-255)
 
 // math variables
 int ScaledRightSWReading = 0;
 int ScaledLeftSWReading = 0;
+
+// SlowPWM setup
+SlowPWM RightSeatSlowPWM(GlobalPWMFreq, &RightHeatOut, RightHeatPin); //create the slowpwm objects for heat output to not blow up the mosfets
+SlowPWM LeftSeatSlowPWM(GlobalPWMFreq, &LeftHeatOut, LeftHeatPin); // must use the pointer in the address
 
 void setup() {
   pinMode(RightSWBacklightPin, OUTPUT);
@@ -61,10 +71,13 @@ void setup() {
   pinMode(LeftHeatPin, OUTPUT);
   pinMode(DC12VReadPin, INPUT);
   pinMode(LightsReadPin, INPUT);
+  RightSeatSlowPWM.on(); //enable the pwm objects
+  LeftSeatSlowPWM.on();
   delay (100);
   if (DebugMode == 1){ //disable the serial and debug messages if debug is not set
   Serial.begin(115200);
     delay(50);
+    Serial.println("Setup Complete...");
   }
   
 }
@@ -74,6 +87,7 @@ void loop() {
   WriteToHeaters (); //write the calculated values to the heater Mosfets
   ReadAndSetBacklights (); //as the function name says
   PlotReadings ();
+  Serial.println("In Loop....");
   delay(100);
 }
 
@@ -112,13 +126,13 @@ void ReadInputs () { //function to read all the inputs to the system
 }
 
 void WriteToHeaters () {
-  analogWrite(LeftHeatPin, LeftHeatOut);
-  analogWrite(RightHeatPin, RightHeatOut);
+  RightSeatSlowPWM.update();
+  LeftSeatSlowPWM.update();
 }
 
 void ReadAndSetBacklights (){
   //LightsReading = digitalRead(DC12VReadPin); //commented out due to this part of the circuit not being built yet
-  if (DC12VReading > 800){
+  if (DC12VReading > 10){
     digitalWrite(LeftSWBacklightPin, HIGH);
     digitalWrite(RightSWBacklightPin, HIGH);
   } else {
