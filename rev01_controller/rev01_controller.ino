@@ -15,9 +15,6 @@
 *
  */
 
-// Libraries
-#include <SlowPWM.h>
-
 // Pin setup
 #define RightSWBacklightPin 4
 #define LeftSWBacklightPin 3
@@ -58,10 +55,6 @@ int HeatOutLevelArray[] = {0,50,100,150,200,255}; // the variable to make settin
 int ScaledRightSWReading = 0;
 int ScaledLeftSWReading = 0;
 
-// SlowPWM setup
-SlowPWM RightSeatSlowPWM(GlobalPWMFreq, &RightHeatOut, RightHeatPin); //create the slowpwm objects for heat output to not blow up the mosfets
-SlowPWM LeftSeatSlowPWM(GlobalPWMFreq, &LeftHeatOut, LeftHeatPin); // must use the pointer in the address
-
 void setup() {
   pinMode(RightSWBacklightPin, OUTPUT);
   pinMode(LeftSWBacklightPin, OUTPUT);
@@ -71,8 +64,8 @@ void setup() {
   pinMode(LeftHeatPin, OUTPUT);
   pinMode(DC12VReadPin, INPUT);
   pinMode(LightsReadPin, INPUT);
-  RightSeatSlowPWM.on(); //enable the pwm objects
-  LeftSeatSlowPWM.on();
+  analogWriteFrequency(RightHeatPin,60);
+  analogWriteFrequency(LeftHeatPin,60);
   delay (100);
   if (DebugMode == 1){ //disable the serial and debug messages if debug is not set
   Serial.begin(115200);
@@ -126,8 +119,8 @@ void ReadInputs () { //function to read all the inputs to the system
 }
 
 void WriteToHeaters () {
-  RightSeatSlowPWM.update();
-  LeftSeatSlowPWM.update();
+  analogWrite(LeftHeatPin, RightHeatOut);
+  analogWrite(RightHeatPin, RightHeatOut);
 }
 
 void ReadAndSetBacklights (){
