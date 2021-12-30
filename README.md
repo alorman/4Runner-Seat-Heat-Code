@@ -8,4 +8,4 @@ For the PCB works see [PCB Repo](https://github.com/alorman/4runner-Seat-Heat-PC
 This code compiles in the Arduino IDE for a Teensy 3.2 or LC.
 
 ## Dependencies 
-This code requires the [SlowPWM library](https://github.com/wkoch/SlowPWM)
+This code requires the [SlowPWM library](https://github.com/wkoch/SlowPWM) 
