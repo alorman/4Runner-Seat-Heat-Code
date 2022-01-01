@@ -47,13 +47,15 @@ int LeftSWReading = 0;
 int DC12VReading = 0;
 int LightsReading = 0;
 
-int GlobalPWMFreq = 1000; //global PWM frequency for both seats in ms
-
 int HeatOutLevelArray[] = {0,50,100,150,200,255}; // the variable to make setting non-linear heating settings easy (0-255)
 
 // math variables
 int ScaledRightSWReading = 0;
 int ScaledLeftSWReading = 0;
+
+// Sleep and timing variables
+bool OutputInhibit = 0; //inhibit all outputs to save battery
+int EngineOffVoltage = 0;  //at what voltage is the battery not being charged
 
 void setup() {
   pinMode(RightSWBacklightPin, OUTPUT);
@@ -88,6 +90,11 @@ void ReadInputs () { //function to read all the inputs to the system
   RightSWReading = analogRead(RightSWPotPin);
   LeftSWReading = analogRead(LeftSWPotPin);
   DC12VReading = analogRead(DC12VReadPin);
+  if (DC12VReading > EngineOffVoltage){
+    OutputInhibit = 0;
+  }else{
+    OutputInhibit = 1;
+  }
   ScaledLeftSWReading = (((LeftSWReading*100)/DC12VReading)*10); // Scale the read pot value as a percentage of the read main voltage
     if (ScaledLeftSWReading <= 100) { //if the pot is off (or as near as possible to off), set the heaters off
     LeftHeatOut = HeatOutLevelArray[0];
@@ -119,21 +126,31 @@ void ReadInputs () { //function to read all the inputs to the system
 }
 
 void WriteToHeaters () {
-  analogWrite(LeftHeatPin, RightHeatOut);
-  analogWrite(RightHeatPin, RightHeatOut);
+  if (OutputInhibit == 0){
+    analogWrite(LeftHeatPin, RightHeatOut);
+    analogWrite(RightHeatPin, RightHeatOut);
+  }else{
+    analogWrite(LeftHeatPin, 0);
+    analogWrite(RightHeatPin, 0);   
+  }
 }
 
 void ReadAndSetBacklights (){
-  LightsReading = analogRead(LightsReadPin); 
-  if (LightsReading > 195) {   //if our voltage reading is high enough we consider it fully on, set the backlights to full
-    RightSWBacklightOut = 255;
-    LeftSWBacklightOut = 255;
-  } else {                     //if they're not full bright, start dimming them
-  RightSWBacklightOut = map(LightsReading, 0, 195, 0, 255);
-  LeftSWBacklightOut = RightSWBacklightOut;
+  if (OutputInhibit == 0){
+    LightsReading = analogRead(LightsReadPin); 
+    if (LightsReading > 195) {   //if our voltage reading is high enough we consider it fully on, set the backlights to full
+      RightSWBacklightOut = 255;
+      LeftSWBacklightOut = 255;
+    } else {                     //if they're not full bright, start dimming them
+    RightSWBacklightOut = map(LightsReading, 0, 195, 0, 255);
+    LeftSWBacklightOut = RightSWBacklightOut;
+    }
+    analogWrite(RightSWBacklightPin, RightSWBacklightOut);  //write the values to the outputs
+    analogWrite(LeftSWBacklightPin, LeftSWBacklightOut);
+  }else{
+    analogWrite(RightSWBacklightPin, 0);
+    analogWrite(LeftSWBacklightPin, 0);    
   }
-  analogWrite(RightSWBacklightPin, RightSWBacklightOut);  //write the values to the outputs
-  analogWrite(LeftSWBacklightPin, LeftSWBacklightOut);
 }
 
 void PlotReadings () {
