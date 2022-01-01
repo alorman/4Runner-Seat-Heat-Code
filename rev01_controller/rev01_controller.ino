@@ -45,7 +45,7 @@ int RightSWReading = 0;
 int LeftSWReading = 0;
 
 int DC12VReading = 0;
-int LightsReading = 0; //perhaps this should be a boolean?
+int LightsReading = 0;
 
 int GlobalPWMFreq = 1000; //global PWM frequency for both seats in ms
 
@@ -64,7 +64,7 @@ void setup() {
   pinMode(LeftHeatPin, OUTPUT);
   pinMode(DC12VReadPin, INPUT);
   pinMode(LightsReadPin, INPUT);
-  analogWriteFrequency(RightHeatPin,60);
+  analogWriteFrequency(RightHeatPin,60); //this setting allows the mosfet to reach full saturation
   analogWriteFrequency(LeftHeatPin,60);
   delay (100);
   if (DebugMode == 1){ //disable the serial and debug messages if debug is not set
@@ -124,14 +124,16 @@ void WriteToHeaters () {
 }
 
 void ReadAndSetBacklights (){
-  //LightsReading = digitalRead(DC12VReadPin); //commented out due to this part of the circuit not being built yet
-  if (DC12VReading > 10){
-    digitalWrite(LeftSWBacklightPin, HIGH);
-    digitalWrite(RightSWBacklightPin, HIGH);
-  } else {
-    digitalWrite(LeftSWBacklightPin, LOW);
-    digitalWrite(RightSWBacklightPin, LOW);
+  LightsReading = analogRead(LightsReadPin); 
+  if (LightsReading > 195) {   //if our voltage reading is high enough we consider it fully on, set the backlights to full
+    RightSWBacklightOut = 255;
+    LeftSWBacklightOut = 255;
+  } else {                     //if they're not full bright, start dimming them
+  RightSWBacklightOut = map(LightsReading, 0, 195, 0, 255);
+  LeftSWBacklightOut = RightSWBacklightOut;
   }
+  analogWrite(RightSWBacklightPin, RightSWBacklightOut);  //write the values to the outputs
+  analogWrite(LeftSWBacklightPin, LeftSWBacklightOut);
 }
 
 void PlotReadings () {
