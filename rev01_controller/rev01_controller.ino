@@ -54,7 +54,7 @@ int ScaledRightSWReading = 0;
 int ScaledLeftSWReading = 0;
 
 // Sleep and timing variables
-bool OutputInhibit = 0; //inhibit all outputs to save battery
+bool OutputInhibit = 1; //inhibit all outputs to save battery
 int EngineOffVoltage = 0;  //at what voltage is the battery not being charged
 
 void setup() {
@@ -89,12 +89,12 @@ void loop() {
 void ReadInputs () { //function to read all the inputs to the system
   RightSWReading = analogRead(RightSWPotPin);
   LeftSWReading = analogRead(LeftSWPotPin);
-  DC12VReading = analogRead(DC12VReadPin);
-  if (DC12VReading > EngineOffVoltage){
-    OutputInhibit = 0;
-  }else{
-    OutputInhibit = 1;
-  }
+//  DC12VReading = analogRead(DC12VReadPin);
+//  if (DC12VReading > EngineOffVoltage){
+//    OutputInhibit = 0;
+//  }else{
+//    OutputInhibit = 1;
+//  }
   ScaledLeftSWReading = (((LeftSWReading*100)/DC12VReading)*10); // Scale the read pot value as a percentage of the read main voltage
     if (ScaledLeftSWReading <= 100) { //if the pot is off (or as near as possible to off), set the heaters off
     LeftHeatOut = HeatOutLevelArray[0];
