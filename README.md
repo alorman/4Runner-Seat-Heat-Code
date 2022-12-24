@@ -4,12 +4,10 @@ This repo tracks the code for the 4Runner Seat Heat project (to allow generic he
 
 For the PCB works see [PCB Repo](https://github.com/alorman/4runner-Seat-Heat-PCB)
 
+This requires PCB version Rev03 or higher. Rev02 requires a dead bug wire to fix the 12V analog input.
+
 ## Hardware
-Teensy 3.2 or LC  
-Rev01 Controller board
-Seat Heat Switches
+This code compiles in the Arduino IDE for a Teensy 3.2 or LC.
 
-## Dependencies 
-It is built to use the Arduino IDE and the TeensyDuino library to allow it to flash the Teensy boards.
-
-
+## Notes
+By calling `GlobalPWMFreq` we can set the PWM rate (stock is about 20khz) so that our MOSFETs can fully latch. If they don't their Rdson is too high and they catch fire. 
