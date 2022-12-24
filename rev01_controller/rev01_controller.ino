@@ -15,6 +15,7 @@
 *
  */
 
+//Pin numbers are applicable to Teensy 3.2
 // Pin setup
 #define RightSWBacklightPin 4
 #define LeftSWBacklightPin 3
@@ -25,13 +26,14 @@
 #define RightHeatPin 22
 #define LeftHeatPin 23
 
-#define DC12VReadPin 16
-#define LightsReadPin 17
+#define DC12VReadPin 17
+#define LightsReadPin 16
 
 //Global Variables
 
 int DebugMode = 1;
 unsigned long previousMillis = 0;
+int Nonce = 0;
 
 //Global IO variables
 
@@ -47,7 +49,7 @@ int LeftSWReading = 0;
 int DC12VReading = 0;
 int LightsReading = 0; //perhaps this should be a boolean?
 
-int GlobalPWMFreq = 1000; //global PWM frequency for both seats in ms
+int GlobalPWMFreq = 1000; //global PWM frequency for both seats in ms. This slow rate allows the mosefets to fully latch
 
 int HeatOutLevelArray[] = {0,50,100,150,200,255}; // the variable to make setting non-linear heating settings easy (0-255)
 
@@ -78,10 +80,11 @@ void setup() {
 void loop() {
   ReadInputs (); //read the digital inputs
   WriteToHeaters (); //write the calculated values to the heater Mosfets
-  ReadAndSetBacklights (); //as the function name says
+  //ReadAndSetBacklights (); //as the function name says
   PlotReadings ();
-  Serial.println("In Loop....");
+  Serial.println((String) Nonce + "In Loop....");
   delay(100);
+  Nonce ++;
 }
 
 void ReadInputs () { //function to read all the inputs to the system
@@ -120,11 +123,11 @@ void ReadInputs () { //function to read all the inputs to the system
 
 void WriteToHeaters () {
   analogWrite(LeftHeatPin, RightHeatOut);
-  analogWrite(RightHeatPin, RightHeatOut);
+  analogWrite(RightHeatPin, LeftHeatOut);
 }
 
 void ReadAndSetBacklights (){
-  //LightsReading = digitalRead(DC12VReadPin); //commented out due to this part of the circuit not being built yet
+  LightsReading = digitalRead(DC12VReadPin); 
   if (DC12VReading > 10){
     digitalWrite(LeftSWBacklightPin, HIGH);
     digitalWrite(RightSWBacklightPin, HIGH);
@@ -136,24 +139,16 @@ void ReadAndSetBacklights (){
 
 void PlotReadings () {
   if (DebugMode == 1){
-  //Serial.print(LeftSWReading);
-  //Serial.print(" ");
-  Serial.print(DC12VReading);
+  Serial.print((String)"12V Reading " + DC12VReading);
   Serial.print(" ");
-  //Serial.print(ScaledLeftSWReading);
-  //Serial.print(" ");
-  //Serial.print(LeftHeatOut);
-  //Serial.print(" ");
-  //Serial.print(RightHeatOut);
-  //Serial.print(" ");
-  //Serial.print(LightsReading);
-  //Serial.print(" ");
-  Serial.print(RightSWReading);
+  Serial.print((String)"Raw Left Reading " + LeftSWReading + " Raw Right Reading " + RightSWReading);
+  Serial.print((String)"Scaled Left SW Reading " + ScaledLeftSWReading);
   Serial.print(" ");
-  Serial.print(ScaledRightSWReading);
+  Serial.print((String)"Scaled Right SW Reading " + ScaledRightSWReading);
   Serial.print(" ");
-  Serial.println(RightHeatOut);
-  //Serial.print(" ");
+  Serial.print((String)"Right Seat Output " + RightHeatOut);
+  Serial.print(" ");
+  Serial.println((String)"Left Seat Output " + LeftHeatOut);
   //Serial.println(LightsReading);
   }
   }

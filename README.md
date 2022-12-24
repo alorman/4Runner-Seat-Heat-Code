@@ -5,7 +5,11 @@ This repo tracks the code for the 4Runner Seat Heat project (to allow generic he
 For the PCB works see [PCB Repo](https://github.com/alorman/4runner-Seat-Heat-PCB)
 
 ## Hardware
-This code compiles in the Arduino IDE for a Teensy 3.2 or LC.
+Teensy 3.2 or LC  
+Rev01 Controller board
+Seat Heat Switches
 
 ## Dependencies 
-This code requires the [SlowPWM library](https://github.com/wkoch/SlowPWM) 
+It is built to use the Arduino IDE and the TeensyDuino library to allow it to flash the Teensy boards.
+
+
